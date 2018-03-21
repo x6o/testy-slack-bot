@@ -29,6 +29,14 @@ and acts accordingly.
 
 This project is licensed under GNU General Public License v3.0 - see the [LICENCE.md](LICENCE.md) file for details.
 
+## Future improvements
+
+These are some of the functionalities that would really make this a superb bot;
+* Ability to assign more than one test to a user.
+* Add a **.t coverage** command to be able to check and update current test coverage of the project.
+* Persistent storage, although this doesn't seem like a big concert ATM (Heroku is pretty reliable).
+* Ability for it to make me a cup of coffee.
+
 ## Acknowledgments
 
 * [Official guide to deploy app](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
