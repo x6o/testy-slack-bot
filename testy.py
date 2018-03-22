@@ -30,7 +30,7 @@ def parse_bot_commands(slack_events):
 def filterTestsByKeyValue(key, value):
     return [element for element in tests if element[key].upper() == value.upper()]
 
-def handle_command(command, channel,userid):
+def handle_command(command, channel, userid):
     response = None
     post_in_test_channel = False
     allowed_commands = ['list', 'clear']
@@ -97,7 +97,7 @@ def handle_command(command, channel,userid):
             channel=channel,
             text=response or default_response)
 
-        if post_in_test_channel and response:
+        if post_in_test_channel and response and tests_channel_id and channel_channel_id != channel:
             # Post to #tests
             slack_client.api_call(
                 "chat.postMessage",
