@@ -32,6 +32,7 @@ This project is licensed under GNU General Public License v3.0 - see the [LICENC
 ## Future improvements
 
 These are some of the functionalities that would really make this a superb bot:
+* **Handle ascii/unicode!!* :C*
 * Ability to assign more than one test to a user.
 * Add a **.t coverage** command to be able to check and update current test coverage of the project.
 * Persistent storage, although this doesn't seem like a big concern ATM (Heroku is pretty reliable).
