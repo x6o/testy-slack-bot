@@ -58,7 +58,7 @@ def handle_command(command, channel, userid):
                     if len(tests) > 0:
                         finalTests = ""
                         for test in tests:
-                            finalTests += "<@{0}> - *{1}* \n".format(test['userId'], test['testName'])
+                            finalTests += u"<@{0}> - *{1}* \n".format(test['userId'], test['testName']).encode('utf-8')
                         response = "Current status:\n\n{}".format(finalTests)
                     else:
                         response = "No one is testing.. are we at :100:%??? :heart_eyes: :heart_eyes:"
@@ -88,10 +88,10 @@ def handle_command(command, channel, userid):
                         # add new user if it doesn't exist yet
                         newEntry = { 'userId': userid, 'testName': args[1] }
                         tests.append(newEntry)
-                    response = "<@{0}> is now testing *{1}*.".format(userid, args[1])
+                    response = u'<@{0}> is now testing *{1}*.'.format(userid, args[1]).encode('utf-8')
                     post_in_test_channel = True
                 else:
-                    response = "*{0}* is already being tested by <@{1}>!".format(args[1], existingTests[0]['userId'])
+                    response = u"*{0}* is already being tested by <@{1}>!".format(args[1], existingTests[0]['userId']).encode('utf-8')
 
         slack_client.api_call(
             "chat.postMessage",
@@ -118,4 +118,4 @@ if __name__ == "__main__":
                 handle_command(command, channel, userid)
             time.sleep(RTM_READ_DELAY)
     else:
-        print("Connection failed :/ See exception traceback.")
+        print("\n\nConnection failed :/ See exception traceback. ^\n")
