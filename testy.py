@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
 import time
-import re
 from slackclient import SlackClient
 
 
