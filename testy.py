@@ -7,7 +7,13 @@ from slackclient import SlackClient
 
 RTM_READ_DELAY = 1
 INVOCATION_COMMAND = ".t"
+ALLOWED_COMMANDS = {
+    'list' : ['list', 'l'],
+    'clear': ['clear', 'c'],
+    'say'  : ['say']
+}
 BOT_API_KEY = "YOUR_API_KEY_HERE"
+ADMIN_USER_IDS = ['U8GA33W6B']
 
 bot_id = None
 tests_channel_id = "C8W99F119"
@@ -32,10 +38,16 @@ def filterTestsByKeyValue(key, value):
 def handle_command(command, channel, userid):
     response = None
     post_in_test_channel = False
-    allowed_commands = ['list', 'clear']
-    default_response = "Not sure what you mean. Try \"*{}* [_test name_]\" to assign a new test to yourself.\n\nOther commands:\n*.t list* - Displays active tests\n*.t clear* - Clear your active test.".format(INVOCATION_COMMAND)
+    default_response = """
+Not sure what you mean. Try \"*{}* _TestName_\" to assign a new test to yourself.
 
-    if command.startswith(INVOCATION_COMMAND):
+Other commands:
+*.t* - Returns this list of commands.
+*.t* list, l - Lists the current status of the tests.
+*.t* clear, c - Clears the test assigned to the user that invoked the command.
+""".format(INVOCATION_COMMAND)
+
+    if command.lower().startswith(INVOCATION_COMMAND):
         
         """
             args[0] -> invocation command
@@ -49,29 +61,42 @@ def handle_command(command, channel, userid):
 
         if len(args) > 1:
 
-            if args[1] in allowed_commands:
+            mainCommand = args[1].lower()
 
-                # 'list' command
-                if args[1] == 'list':
-                    if len(tests) > 0:
-                        finalTests = ""
-                        for test in tests:
-                            finalTests += u"<@{0}> - *{1}* \n".format(test['userId'], test['testName']).encode('utf-8')
-                        response = "Current status:\n\n{}".format(finalTests)
-                    else:
-                        response = "No one is testing.. are we at :100:%??? :heart_eyes: :heart_eyes:"
-                
-                # 'clear' command
-                if args[1] == 'clear':
-                    if len(tests) > 0:
-                        for test in tests:
-                            if test['userId'] == userid:
-                                test['testName'] = ":sleeping:"
-                            response = "Test cleared."
+            # 'list' command
+            if mainCommand in ALLOWED_COMMANDS['list']:
+
+                if len(tests) > 0:
+                    finalTests = ""
+                    for test in tests:
+                        finalTests += u"<@{0}> - *{1}* \n".format(test['userId'], test['testName']).encode('utf-8')
+                    response = "Current status:\n\n{}".format(finalTests)
+                else:
+                    response = "No one is testing.. are we at :100:%??? :heart_eyes: :heart_eyes:"
+            # 'clear' command
+            elif mainCommand in ALLOWED_COMMANDS['clear']:
+
+                if len(tests) > 0:
+                    for test in tests:
+                        if test['userId'] == userid:
+                            test['testName'] = ":sleeping:"
+                        response = "Test cleared."
+            # 'say' command
+            elif mainCommand in ALLOWED_COMMANDS['say']:
+
+                if (userid in ADMIN_USER_IDS) and args[2]:
+                    # Announce param1 in #tests
+                    slack_client.api_call(
+                        "chat.postMessage",
+                        channel=tests_channel_id,
+                        text=args[2])
+                    response = "Announced in test channel."
+
             else:
                 
                 # if no known command, must be test name
-                existingTests = filterTestsByKeyValue('testName', args[1])
+                testName = mainCommand
+                existingTests = filterTestsByKeyValue('testName', testName)
                 existingUsers = filterTestsByKeyValue('userId', userid)
 
                 # check if test is already added
@@ -81,22 +106,22 @@ def handle_command(command, channel, userid):
                     if len(existingUsers) > 0:
                         for test in tests:
                             if test['userId'] == userid:
-                                test['testName'] = args[1]
+                                test['testName'] = testName
                     else:
                         # add new user if it doesn't exist yet
-                        newEntry = { 'userId': userid, 'testName': args[1] }
+                        newEntry = { 'userId': userid, 'testName': testName }
                         tests.append(newEntry)
-                    response = u'<@{0}> is now testing *{1}*.'.format(userid, args[1]).encode('utf-8')
+                    response = u'<@{0}> is now testing *{1}*.'.format(userid, testName).encode('utf-8')
                     post_in_test_channel = True
                 else:
-                    response = u"*{0}* is already being tested by <@{1}>!".format(args[1], existingTests[0]['userId']).encode('utf-8')
+                    response = u"*{0}* is already being tested by <@{1}>!".format(testName, existingTests[0]['userId']).encode('utf-8')
 
         slack_client.api_call(
             "chat.postMessage",
             channel=channel,
             text=response or default_response)
 
-        if post_in_test_channel and response and tests_channel_id and channel_channel_id != channel:
+        if post_in_test_channel and response and tests_channel_id and tests_channel_id != channel:
             # Post to #tests
             slack_client.api_call(
                 "chat.postMessage",
@@ -111,9 +136,13 @@ if __name__ == "__main__":
         print("Connected to Slack :D")
         bot_id = slack_client.api_call("auth.test")['user_id']
         while True:
-            command, channel, userid = parse_bot_commands(slack_client.rtm_read())
-            if command:
-                handle_command(command, channel, userid)
-            time.sleep(RTM_READ_DELAY)
+            try:
+                command, channel, userid = parse_bot_commands(slack_client.rtm_read())
+                if command:
+                    handle_command(command, channel, userid)
+                time.sleep(RTM_READ_DELAY)
+            except:
+                pass
+
     else:
         print("\n\nConnection failed :/ See exception traceback. ^\n")
