@@ -47,7 +47,7 @@ Other commands:
 *.t* clear, c - Clears the test assigned to the user that invoked the command.
 """.format(INVOCATION_COMMAND)
 
-    if command.lower().startswith(INVOCATION_COMMAND):
+    if command.startswith(INVOCATION_COMMAND):
         
         """
             args[0] -> invocation command
@@ -61,7 +61,7 @@ Other commands:
 
         if len(args) > 1:
 
-            mainCommand = args[1].lower()
+            mainCommand = args[1]
 
             # 'list' command
             if mainCommand in ALLOWED_COMMANDS['list']:
