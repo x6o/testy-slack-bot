@@ -17,7 +17,9 @@ and acts accordingly.
 * **.t** _testName_ - Assigns _testName_ to the user that invoked the command. Notice that the test name can't have spaces.
 * **.t** list, l - Lists the current status of the tests.
 * **.t** clear, c - Clears the test assigned to the user that invoked the command.
-
+* **.t** listForbidden, lf - See list of forbidden classes/tests.
+* **.t** addForbidden, +f _TestName_ - Add _TestName_ to forbidden list.
+* **.t** removeForbidden, -f _TestName_ - Remove _TestName_ from forbidden list.
 ### Prerequisites 
 
 * For Heroku deployment
@@ -25,6 +27,7 @@ and acts accordingly.
     * [git](https://git-scm.com/downloads)
 * For slack bot
     * [SlackClient](https://pypi.python.org/pypi/slackclient)
+    * [Firebase Admin](https://github.com/firebase/firebase-admin-python)
 
 ### License
 
@@ -35,7 +38,7 @@ This project is licensed under GNU General Public License v3.0 - see the [LICENC
 These are some of the functionalities that would really make this a superb bot:
 * Ability to assign more than one test to a user.
 * Add a **.t coverage** command to be able to check and update current test coverage of the project.
-* Persistent storage, although this doesn't seem like a big concern ATM (Heroku is pretty reliable).
+* ~~Persistent storage, although this doesn't seem like a big concern ATM (Heroku is pretty reliable _cough cough_)~~ **Added Firebase Integration**
 * Ability for it to make me a cup of coffee.
 
 ## Acknowledgments
@@ -43,3 +46,4 @@ These are some of the functionalities that would really make this a superb bot:
 * [Official guide to deploy app](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
 * [Official guide about worker](https://devcenter.heroku.com/articles/background-jobs-queueing)
 * [Guided "Simple twitter-bot with Python, Tweepy and Heroku"](http://briancaffey.github.io/2016/04/05/twitter-bot-tutorial.html)
+* [Firebase Admin Documentation](https://firebase.google.com/docs/reference/admin/python/firebase_admin.db)
